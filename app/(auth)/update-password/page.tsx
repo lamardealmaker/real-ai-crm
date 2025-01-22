@@ -59,7 +59,7 @@ export default function UpdatePasswordPage() {
       router.push('/sign-in')
     } catch (error) {
       toast.error('Error updating password')
-      console.error('Update password error:', error)
+      console.error('Password update error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -84,7 +84,11 @@ export default function UpdatePasswordPage() {
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input 
+                      type="password"
+                      autoComplete="new-password"
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,7 +102,11 @@ export default function UpdatePasswordPage() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input 
+                      type="password"
+                      autoComplete="new-password"
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -27,6 +27,8 @@ type ResetPasswordForm = z.infer<typeof resetPasswordSchema>
 
 export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -42,13 +44,14 @@ export default function ResetPasswordPage() {
       setIsLoading(true)
       
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
+        redirectTo: `${window.location.origin}/update-password`,
       })
 
       if (error) throw error
 
+      setUserEmail(data.email)
+      setEmailSent(true)
       toast.success('Check your email for the password reset link')
-      router.push('/sign-in')
     } catch (error) {
       toast.error('Error sending password reset email')
       console.error('Password reset error:', error)
@@ -57,13 +60,40 @@ export default function ResetPasswordPage() {
     }
   }
 
+  if (emailSent) {
+    return (
+      <div className="container flex h-screen w-screen flex-col items-center justify-center">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+          <div className="flex flex-col space-y-2 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight">Check your email</h1>
+            <p className="text-sm text-muted-foreground">
+              We&apos;ve sent a password reset link to {userEmail}
+            </p>
+          </div>
+          <div className="flex flex-col space-y-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Click the link in your email to reset your password. If you don&apos;t see it, check your spam folder.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/sign-in')}
+              className="w-full"
+            >
+              Back to Sign In
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Reset password</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your email address and we'll send you a link to reset your password
+            Enter your email address and we&apos;ll send you a link to reset your password
           </p>
         </div>
 
@@ -76,7 +106,12 @@ export default function ResetPasswordPage() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
+                    <Input 
+                      placeholder="email@example.com" 
+                      type="email"
+                      autoComplete="email"
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

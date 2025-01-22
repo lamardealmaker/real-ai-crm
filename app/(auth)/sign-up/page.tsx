@@ -43,6 +43,8 @@ type SignUpForm = z.infer<typeof signUpSchema>
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [isConfirmEmailSent, setIsConfirmEmailSent] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -99,8 +101,9 @@ export default function SignUpPage() {
         throw new Error('Failed to create user profile')
       }
 
+      setUserEmail(data.email)
+      setIsConfirmEmailSent(true)
       toast.success('Please check your email to confirm your account')
-      router.push('/sign-in')
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
@@ -111,6 +114,33 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (isConfirmEmailSent) {
+    return (
+      <div className="container flex h-screen w-screen flex-col items-center justify-center">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+          <div className="flex flex-col space-y-2 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight">Check your email</h1>
+            <p className="text-sm text-muted-foreground">
+              We&apos;ve sent a confirmation link to {userEmail}
+            </p>
+          </div>
+          <div className="flex flex-col space-y-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Click the link in your email to confirm your account. If you don&apos;t see it, check your spam folder.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/sign-in')}
+              className="w-full"
+            >
+              Back to Sign In
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
